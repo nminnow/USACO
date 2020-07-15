@@ -7,14 +7,14 @@ PROB: combo
 
 int N;
 
-inline bool int_tol(int i, int k)
+inline bool in_tol(int i, int k)
 {
     return abs(i - k) < 3 || abs(i - k) > N - 3;
 }
 
-inline bool all_int_tol(int a, int b, int c, int (& key)[3])
+inline bool all_in_tol(int a, int b, int c, int (& key)[3])
 {
-    return int_tol(a, key[0]) && int_tol(b, key[1]) && int_tol(c, key[2]);
+    return in_tol(a, key[0]) && in_tol(b, key[1]) && in_tol(c, key[2]);
 }
 
 int main()
@@ -40,7 +40,7 @@ int main()
         {
             for (int c = 1; c <= N; ++c)
             {
-                if (all_int_tol(a, b, c, fkey) || all_int_tol(a, b, c, mkey))
+                if (all_in_tol(a, b, c, fkey) || all_in_tol(a, b, c, mkey))
                 {
                     ++combos;
                 }
