@@ -4,6 +4,7 @@ LANG: C++11
 PROB: barn1
 */
 #include <fstream>
+#include <algorithm>
 
 int main()
 {
@@ -21,48 +22,56 @@ int main()
         stalls[n - 1] = true;
     }
 
-    int boards = C, blocked = C;
-    int min_beg = 0, min_end = 0;
-    while (boards > M)
+    int first = 0;
+    for (int s = 0; s < S; ++s)
     {
-        for (int t = min_beg; t < min_end; ++t)
+        if (stalls[s])
         {
-            stalls[t] = true;
+            first = s;
+            break;
         }
+    }
 
-        blocked = 0;
-        boards = 0;
-        bool on_board = false;
-        int min_gap = S, gap = 0, beg = 0;
-
-        for (int s = 0; s < S; ++s)
+    int last = first;
+    for (int s = S - 1; s > first; --s)
+    {
+        if (stalls[s])
         {
-            if (stalls[s])
+            last = s;
+            break;
+        }
+    }
+
+    int gaps[200] = {}, gap = 0, n = 0, b = 1;
+    bool on_board = true;
+    for (int s = first + 1; s <= last; ++s)
+    {
+        if (stalls[s])
+        {
+            if (!on_board)
             {
-                ++blocked;
-                if (!on_board)
-                {
-                    on_board = true;
-                    ++boards;
-                    if (min_gap > gap && gap != 0 && (stalls[0] ? true : beg))
-                    {
-                        min_gap = gap;
-                        min_beg = beg;
-                        min_end = s;
-                    }
-                    gap = 0;
-                }
-            }
-            else
-            {
-                ++gap;
-                if (on_board)
-                {
-                    on_board = false;
-                    beg = s;
-                }
+                on_board = true;
+                ++b;
+                gaps[n] = gap;
+                ++n;
+                gap = 0;
             }
         }
+        else
+        {
+            ++gap;
+            if (on_board)
+            {
+                on_board = false;
+            }
+        }
+    }
+
+    int blocked = C;
+    std::sort(gaps, gaps + n);
+    for (int g = 0; g < b - M; ++g)
+    {
+        blocked += gaps[g];
     }
 
     fout << blocked << std::endl;
