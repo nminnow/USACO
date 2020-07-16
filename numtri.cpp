@@ -7,6 +7,7 @@ PROB: numtri
 
 int R;
 int max_sum;
+int max_pos_sums[1000][1000];
 int nums[500500];
 
 void step(int sum, int row, int col)
@@ -22,8 +23,13 @@ void step(int sum, int row, int col)
 
     sum += nums[row * (row + 1) / 2 + col];
 
-    step(sum, row + 1, col);
-    step(sum, row + 1, col + 1);
+    if (sum > max_pos_sums[row][col])
+    {
+        max_pos_sums[row][col] = sum;
+
+        step(sum, row + 1, col);
+        step(sum, row + 1, col + 1);
+    }
 }
 
 int main()
