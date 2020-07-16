@@ -5,45 +5,35 @@ PROB: numtri
 */
 #include <fstream>
 
-int R;
-int max_sum;
-int max_pos_sums[1000][1000];
-int nums[500500];
-
-void step(int sum, int row, int col)
+inline int max(int a, int b)
 {
-    if (row == R)
-    {
-        if (sum > max_sum)
-        {
-            max_sum = sum;
-        }
-        return;
-    }
-
-    sum += nums[row * (row + 1) / 2 + col];
-
-    if (sum > max_pos_sums[row][col])
-    {
-        max_pos_sums[row][col] = sum;
-
-        step(sum, row + 1, col);
-        step(sum, row + 1, col + 1);
-    }
+    return (a > b) ? a : b;
 }
 
 int main()
 {
     std::ifstream fin("numtri.in");
     std::ofstream fout("numtri.out");
+
+    int R;
     fin >> R;
+
+    int nums[500500];
     for (int t = 0; t < R * (R + 1) / 2; ++t)
     {
         fin >> nums[t];
     }
 
-    step(0, 0, 0);
+    for (int row = R - 2; row >= 0; --row)
+    {
+        for (int col = 0; col <= row; ++col)
+        {
+            nums[row * (row + 1) / 2 + col] += max(
+                nums[(row + 1) * (row + 2) / 2 + col], 
+                nums[(row + 1) * (row + 2) / 2 + col + 1]);
+        }
+    }
 
-    fout << max_sum << std::endl;
+    fout << nums[0] << std::endl;
     return 0;
 }
