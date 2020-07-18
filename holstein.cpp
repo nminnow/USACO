@@ -3,8 +3,8 @@ ID: audrey.6
 LANG: C++11
 PROB: holstein
 */
+#include <iostream>
 #include <fstream>
-#include <vector>
 
 struct State
 {
@@ -12,45 +12,62 @@ struct State
     int vitamins[25] = {};
 };
 
+std::ifstream fin("holstein.in");
+std::ofstream fout("holstein.out");
 int V, G;
 int reqs[25], feeds[15][25];
-std::vector<State> states, prv_states = {{}};
-int min_n = 15;
 
-bool is_healthy(int n, const State & prv_state, int g)
+bool search(int n, int m, State state)
 {
-    State state = prv_state;
-    state.scoops[g] = true;
-    for (int v = 0; v < V; ++v)
-        state.vitamins[v] += feeds[g][v];
-    states.push_back(state);
-
+    std::cout << n << ' ' << m << std::endl;
+    bool is_healthy = true;
     for (int v = 0; v < V; ++v)
         if (state.vitamins[v] < reqs[v])
-            return false;
+            is_healthy = false;
 
-    min_n = n;
-    return true;
+    if (is_healthy)
+    {
+        fout << m;
+        for (int i = 0; i < G; ++i)
+            if (state.scoops[i])
+                fout << ' ' << i + 1;
+        fout << std::endl;
+        return true;
+    }
+    for (int i = 0; i < G; ++i)
+        if (state.scoops[i])
+            std::cout << i + 1 << ' ';
+    std::cout << std::endl;
+
+    if (!n)
+        return false;
+
+    for (int g = 0; g < G; ++g)
+        if (!state.scoops[g])
+        {
+            state.scoops[g] = true;
+            for (int v = 0; v < V; ++v)
+                state.vitamins[v] += feeds[g][v];
+
+            if (search(n - 1, m, state))
+                return true;
+
+            state.scoops[g] = false;
+            for (int v = 0; v < V; ++v)
+                state.vitamins[v] -= feeds[g][v];
+        }
+    return false;
 }
 
-void search()
+void id_search()
 {
     for (int n = 0; n < G; ++n)
-    {
-        for (State prv_state : prv_states)
-            for (int g = 0; g < G; ++g)
-                if (!prv_state.scoops[g] && is_healthy(n, prv_state, g))
-                    return;
-        prv_states = states;
-        states = {};
-    }
+        if (search(n, n, {}))
+            return;
 }
 
 int main()
 {
-    std::ifstream fin("holstein.in");
-    std::ofstream fout("holstein.out");
-
     fin >> V;
     for (int v = 0; v < V; ++v)
         fin >> reqs[v];
@@ -60,12 +77,6 @@ int main()
         for (int v = 0; v < V; ++v)
             fin >> feeds[i][v];
 
-    search();
-
-    fout << min_n + 1;
-    for (int i = 0; i < G; ++i)
-        if (states.back().scoops[i])
-            fout << ' ' << i + 1;
-    fout << std::endl;
+    id_search();
     return 0;
 }
