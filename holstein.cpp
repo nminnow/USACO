@@ -3,7 +3,6 @@ ID: audrey.6
 LANG: C++11
 PROB: holstein
 */
-#include <iostream>
 #include <fstream>
 
 struct State
@@ -19,7 +18,6 @@ int reqs[25], feeds[15][25];
 
 bool search(int n, int m, State state)
 {
-    std::cout << n << ' ' << m << std::endl;
     bool is_healthy = true;
     for (int v = 0; v < V; ++v)
         if (state.vitamins[v] < reqs[v])
@@ -34,10 +32,6 @@ bool search(int n, int m, State state)
         fout << std::endl;
         return true;
     }
-    for (int i = 0; i < G; ++i)
-        if (state.scoops[i])
-            std::cout << i + 1 << ' ';
-    std::cout << std::endl;
 
     if (!n)
         return false;
@@ -61,7 +55,7 @@ bool search(int n, int m, State state)
 
 void id_search()
 {
-    for (int n = 0; n < G; ++n)
+    for (int n = 1; n <= G; ++n)
         if (search(n, n, {}))
             return;
 }
