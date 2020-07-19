@@ -16,13 +16,15 @@ std::ofstream fout("holstein.out");
 int V, G;
 int reqs[25], feeds[15][25];
 
-bool search(int n, int m, State state)
+bool search(int n, int m, State state, int f)
 {
     bool is_healthy = true;
     for (int v = 0; v < V; ++v)
         if (state.vitamins[v] < reqs[v])
+        {
             is_healthy = false;
-
+            break;
+        }
     if (is_healthy)
     {
         fout << m;
@@ -36,14 +38,14 @@ bool search(int n, int m, State state)
     if (!n)
         return false;
 
-    for (int g = 0; g < G; ++g)
+    for (int g = f + 1; g < G; ++g)
         if (!state.scoops[g])
         {
             state.scoops[g] = true;
             for (int v = 0; v < V; ++v)
                 state.vitamins[v] += feeds[g][v];
 
-            if (search(n - 1, m, state))
+            if (search(n - 1, m, state, g))
                 return true;
 
             state.scoops[g] = false;
@@ -51,13 +53,6 @@ bool search(int n, int m, State state)
                 state.vitamins[v] -= feeds[g][v];
         }
     return false;
-}
-
-void id_search()
-{
-    for (int n = 1; n <= G; ++n)
-        if (search(n, n, {}))
-            return;
 }
 
 int main()
@@ -71,6 +66,7 @@ int main()
         for (int v = 0; v < V; ++v)
             fin >> feeds[i][v];
 
-    id_search();
-    return 0;
+    for (int n = 1; n <= G; ++n)
+        if (search(n, n, {}, -1))
+            return 0;
 }
